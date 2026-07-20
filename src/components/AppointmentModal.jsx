@@ -23,29 +23,11 @@ const AppointmentModal = ({ isOpen, onClose }) => {
   const [selectedTime, setSelectedTime] = useState(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const timeSlots = [
-    "08:00",
-    "08:30",
-    "09:00",
-    "09:30",
-    "10:00",
-    "10:30",
-    "11:00",
-    "11:30",
-    "12:00",
-    "12:30",
-    "13:00",
-    "13:30",
-    "14:00",
-    "14:30",
-    "15:00",
-    "15:30",
-    "16:00",
-    "16:30",
-    "17:00",
-    "17:30",
-    "18:00",
-  ];
+  const timeSlots = Array.from({ length: 24 }, (_, i) => {
+    const hour = Math.floor(i / 2) + 8;
+    const min = i % 2 === 0 ? "00" : "30";
+    return `${hour.toString().padStart(2, "0")}:${min}`;
+  });
 
   const bookedSlots = new Set(["08:30", "10:00", "11:30", "14:00", "15:30"]);
 
@@ -56,14 +38,7 @@ const AppointmentModal = ({ isOpen, onClose }) => {
   const handleNext = () => setCurrentMonth(addMonths(currentMonth, 1));
 
   const handleConfirm = () => {
-    if (selectedDate && selectedTime) {
-      setIsSuccess(true);
-    }
-  };
-
-  const closeSuccess = () => {
-    setIsSuccess(false);
-    onClose();
+    if (selectedDate && selectedTime) setIsSuccess(true);
   };
 
   if (!isOpen) return null;
@@ -73,7 +48,7 @@ const AppointmentModal = ({ isOpen, onClose }) => {
       style={{
         position: "fixed",
         inset: 0,
-        backgroundColor: "rgba(0,0,0,0.7)",
+        background: "rgba(0,0,0,0.8)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -82,23 +57,21 @@ const AppointmentModal = ({ isOpen, onClose }) => {
     >
       <div
         style={{
-          backgroundColor: "white",
-          borderRadius: "24px",
+          background: "white",
+          borderRadius: "20px",
           width: "100%",
           maxWidth: "1100px",
-          maxHeight: "95vh",
+          maxHeight: "92vh",
           overflow: "hidden",
-          boxShadow: "0 25px 50px -12px rgb(0 0 0 / 0.4)",
         }}
       >
         {!isSuccess ? (
           <>
-            {/* Заголовок */}
             <div
               style={{
-                background: "linear-gradient(to right, #4f46e5, #2563eb)",
+                background: "linear-gradient(to right,#4f46e5,#1e40af)",
                 color: "white",
-                padding: "32px",
+                padding: "30px",
               }}
             >
               <div
@@ -109,38 +82,28 @@ const AppointmentModal = ({ isOpen, onClose }) => {
                 }}
               >
                 <div
-                  style={{ display: "flex", alignItems: "center", gap: "16px" }}
+                  style={{ display: "flex", alignItems: "center", gap: "15px" }}
                 >
-                  <CalendarClock size={36} />
-                  <div>
-                    <h2 style={{ fontSize: "28px", fontWeight: "bold" }}>
-                      Запись на приём
-                    </h2>
-                    <p style={{ marginTop: "4px", opacity: 0.9 }}>
-                      Выберите дату и время
-                    </p>
-                  </div>
+                  <CalendarClock size={35} />
+                  <h2 style={{ fontSize: "28px", fontWeight: "bold" }}>
+                    Book Appointment
+                  </h2>
                 </div>
-                <button
-                  onClick={onClose}
-                  style={{ padding: "8px", borderRadius: "9999px" }}
-                >
-                  <X size={28} />
+                <button onClick={onClose}>
+                  <X size={30} />
                 </button>
               </div>
             </div>
 
             <div
               style={{
-                padding: "32px",
+                padding: "30px",
                 display: "grid",
-                gridTemplateColumns: "2fr 1fr",
+                gridTemplateColumns: "1.1fr 1fr",
                 gap: "40px",
-                maxHeight: "calc(95vh - 200px)",
-                overflow: "hidden",
               }}
             >
-              {/* Календарь */}
+              {/* Calendar */}
               <div>
                 <div
                   style={{
@@ -149,65 +112,39 @@ const AppointmentModal = ({ isOpen, onClose }) => {
                     marginBottom: "20px",
                   }}
                 >
-                  <button onClick={handlePrev} style={{ padding: "10px 16px" }}>
-                    ← Предыдущий
-                  </button>
-                  <h3 style={{ fontSize: "22px", fontWeight: "600" }}>
-                    {format(currentMonth, "LLLL yyyy", { locale: ru })}
-                  </h3>
-                  <button onClick={handleNext} style={{ padding: "10px 16px" }}>
-                    Следующий →
-                  </button>
+                  <button onClick={handlePrev}>← Prev</button>
+                  <h3>{format(currentMonth, "LLLL yyyy", { locale: ru })}</h3>
+                  <button onClick={handleNext}>Next →</button>
                 </div>
-
                 <div
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(7, 1fr)",
+                    gridTemplateColumns: "repeat(7,1fr)",
                     gap: "4px",
-                    textAlign: "center",
-                    marginBottom: "8px",
                   }}
                 >
-                  {["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map((d) => (
-                    <div key={d} style={{ fontWeight: "600", color: "#555" }}>
-                      {d}
-                    </div>
-                  ))}
-                </div>
-
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(7, 1fr)",
-                    gap: "6px",
-                  }}
-                >
-                  {days.map((day, idx) => {
-                    const isCurrentMonth =
-                      day.getMonth() === currentMonth.getMonth();
-                    const isSelected =
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                    (d) => (
+                      <div
+                        key={d}
+                        style={{ textAlign: "center", fontWeight: "600" }}
+                      >
+                        {d}
+                      </div>
+                    ),
+                  )}
+                  {days.map((day, i) => {
+                    const selected =
                       selectedDate && isSameDay(day, selectedDate);
-                    const today = isToday(day);
-
                     return (
                       <button
-                        key={idx}
-                        onClick={() => isCurrentMonth && setSelectedDate(day)}
+                        key={i}
+                        onClick={() => setSelectedDate(day)}
                         style={{
-                          height: "52px",
-                          borderRadius: "12px",
-                          backgroundColor: isSelected
-                            ? "#4f46e5"
-                            : today
-                              ? "#eef2ff"
-                              : "transparent",
-                          color: isSelected
-                            ? "white"
-                            : today
-                              ? "#4f46e5"
-                              : "#111",
-                          fontWeight: isSelected || today ? "600" : "400",
+                          height: "50px",
+                          borderRadius: "10px",
+                          background: selected ? "#4f46e5" : "transparent",
+                          color: selected ? "white" : "black",
                         }}
                       >
                         {format(day, "d")}
@@ -217,58 +154,38 @@ const AppointmentModal = ({ isOpen, onClose }) => {
                 </div>
               </div>
 
-              {/* Время - теперь с прокруткой */}
+              {/* Time */}
               <div>
-                <h3
-                  style={{
-                    fontSize: "20px",
-                    fontWeight: "600",
-                    marginBottom: "16px",
-                  }}
-                >
-                  Выберите время{" "}
-                  {selectedDate &&
-                    `• ${format(selectedDate, "dd MMMM", { locale: ru })}`}
-                </h3>
-
+                <h3 style={{ marginBottom: "15px" }}>Available Time</h3>
                 <div
                   style={{
                     maxHeight: "420px",
                     overflowY: "auto",
-                    paddingRight: "12px",
                     display: "grid",
-                    gridTemplateColumns: "repeat(3, 1fr)",
+                    gridTemplateColumns: "repeat(3,1fr)",
                     gap: "10px",
                   }}
                 >
-                  {timeSlots.map((time) => {
-                    const isBooked = bookedSlots.has(time);
-                    const isSelected = selectedTime === time;
-
+                  {timeSlots.map((t) => {
+                    const booked = bookedSlots.has(t);
+                    const selected = selectedTime === t;
                     return (
                       <button
-                        key={time}
-                        onClick={() => !isBooked && setSelectedTime(time)}
-                        disabled={isBooked}
+                        key={t}
+                        onClick={() => !booked && setSelectedTime(t)}
+                        disabled={booked}
                         style={{
-                          padding: "16px 8px",
-                          borderRadius: "12px",
-                          backgroundColor: isSelected
+                          padding: "16px",
+                          borderRadius: "10px",
+                          background: selected
                             ? "#4f46e5"
-                            : isBooked
-                              ? "#f3f4f6"
-                              : "#fff",
-                          color: isSelected
-                            ? "white"
-                            : isBooked
-                              ? "#999"
-                              : "#111",
-                          border: isSelected ? "none" : "2px solid #e5e7eb",
-                          cursor: isBooked ? "not-allowed" : "pointer",
-                          fontSize: "16px",
+                            : booked
+                              ? "#eee"
+                              : "white",
+                          color: selected ? "white" : booked ? "#999" : "black",
                         }}
                       >
-                        {time}
+                        {t}
                       </button>
                     );
                   })}
@@ -276,64 +193,52 @@ const AppointmentModal = ({ isOpen, onClose }) => {
               </div>
             </div>
 
-            {/* Кнопка подтверждения */}
             <div
               style={{
-                padding: "24px 32px",
-                borderTop: "1px solid #eee",
-                backgroundColor: "#f8fafc",
+                padding: "25px",
                 textAlign: "right",
+                borderTop: "1px solid #ddd",
               }}
             >
               <button
                 onClick={handleConfirm}
                 disabled={!selectedDate || !selectedTime}
                 style={{
-                  padding: "16px 48px",
+                  padding: "16px 50px",
                   fontSize: "18px",
-                  fontWeight: "600",
                   background:
-                    !selectedDate || !selectedTime
-                      ? "#ccc"
-                      : "linear-gradient(to right, #4f46e5, #3b82f6)",
+                    !selectedDate || !selectedTime ? "#999" : "#4f46e5",
                   color: "white",
                   border: "none",
                   borderRadius: "12px",
-                  cursor:
-                    !selectedDate || !selectedTime ? "not-allowed" : "pointer",
                 }}
               >
-                Подтвердить запись
+                Confirm Appointment
               </button>
             </div>
           </>
         ) : (
-          /* Успешное сообщение */
-          <div style={{ padding: "80px 40px", textAlign: "center" }}>
+          <div style={{ padding: "80px", textAlign: "center" }}>
             <CheckCircle
               size={80}
-              style={{ color: "#22c55e", margin: "0 auto 24px" }}
+              color="#22c55e"
+              style={{ marginBottom: "20px" }}
             />
-            <h2 style={{ fontSize: "32px", marginBottom: "16px" }}>
-              Вы успешно записаны!
-            </h2>
-            <p
-              style={{ fontSize: "20px", color: "#555", marginBottom: "40px" }}
-            >
-              На {format(selectedDate, "dd MMMM yyyy", { locale: ru })} в{" "}
+            <h2>Appointment Confirmed!</h2>
+            <p style={{ margin: "20px 0", fontSize: "18px" }}>
+              On {format(selectedDate, "dd MMMM yyyy", { locale: ru })} at{" "}
               {selectedTime}
             </p>
             <button
-              onClick={closeSuccess}
+              onClick={onClose}
               style={{
-                padding: "16px 40px",
+                padding: "14px 40px",
                 background: "#4f46e5",
                 color: "white",
                 borderRadius: "12px",
-                fontSize: "18px",
               }}
             >
-              Закрыть окно
+              Close
             </button>
           </div>
         )}
